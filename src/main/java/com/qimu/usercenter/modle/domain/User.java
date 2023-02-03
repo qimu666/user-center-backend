@@ -1,9 +1,7 @@
 package com.qimu.usercenter.modle.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
@@ -37,7 +35,7 @@ public class User implements Serializable {
     private String avatarUrl;
 
     /**
-     * 性别
+     * 性别  (0 - 男 , 1 - 女)
      */
     private Integer gender;
 
@@ -74,10 +72,14 @@ public class User implements Serializable {
     /**
      * 是否删除(0 - 删除 , 1 - 正常)
      */
-
+    @TableLogic
     private Integer isDelete;
+
+    /**
+     * 用户角色( 0 - 默认用户 ， 1 - 管理员)
+     */
+    private Integer userRole;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
-
 }

@@ -1,12 +1,16 @@
 package com.qimu.usercenter.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.qimu.usercenter.modle.domain.User;
 import com.qimu.usercenter.service.UserService;
+import org.apache.commons.lang3.ObjectUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.util.DigestUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 
@@ -33,7 +37,65 @@ class UserServiceImplTest {
         user.setEmail("122wqwq");
         boolean save = userService.save(user);
 //        Assert.a(save);
-        Assertions.assertEquals(save,false);
+        Assertions.assertEquals(save, false);
     }
 
+    @Test
+    void userRegistration() {
+        String userAccount = "";
+        String userPassword = "123456";
+        String checkPassword = "123456";
+        // 1. 非空
+        long l = userService.userRegistration(userAccount, userPassword, checkPassword);
+        Assertions.assertEquals(l, -1);
+        // 2. 账户长度不小于4位
+        userAccount = "qm";
+        l = userService.userRegistration(userAccount, userPassword, checkPassword);
+        Assertions.assertEquals(l, -1);
+        // 3. 密码就不小于8位吧
+        userPassword = "123456";
+        checkPassword = "123456";
+        l = userService.userRegistration(userAccount, userPassword, checkPassword);
+        Assertions.assertEquals(l, -1);
+        // 5. 账户不包含特殊字符
+        userAccount = "@##AA";
+        l = userService.userRegistration(userAccount, userPassword, checkPassword);
+        Assertions.assertEquals(l, -1);
+        // 6. 密码和校验密码相同
+        userPassword = "12345678";
+        checkPassword = "12345679";
+        l = userService.userRegistration(userAccount, userPassword, checkPassword);
+        Assertions.assertEquals(l, -1);
+        // 4. 账户不能重复
+
+        userAccount = "qieruww";
+        userPassword = "qwer1234";
+        checkPassword = "qwer1234";
+        l = userService.userRegistration(userAccount, userPassword, checkPassword);
+        Assertions.assertTrue(l > 0);
+
+    }
+
+    @Test
+    void testGetUser() {
+        String userAccount = "qweer55";
+        String userPassword = "12345689";
+        // String checkPassword = "123456789";
+        // long l = userService.userRegistration(userAccount, userPassword, checkPassword);
+
+        final String SALT = "qimu";
+        String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes(StandardCharsets.UTF_8));
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userAccount", userAccount)
+                .eq("userPassword", encryptPassword);
+        User user = userService.getOne(queryWrapper);
+        if (!ObjectUtils.allNotNull(user)) {
+            System.out.println("登陆失败");
+        } else {
+            System.out.println("登陆成功");
+        }
+
+        // User b = userService.userLogin(userAccount, userPassword);
+        // Assertions.assertTrue(b);
+    }
 }

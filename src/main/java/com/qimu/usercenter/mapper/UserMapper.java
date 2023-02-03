@@ -1,7 +1,7 @@
 package com.qimu.usercenter.mapper;
 
-import com.qimu.usercenter.modle.domain.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.qimu.usercenter.modle.domain.User;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
