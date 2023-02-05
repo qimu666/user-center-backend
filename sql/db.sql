@@ -1,6 +1,5 @@
 -- auto-generated definition
-create schema user_center collate utf8_general_ci;
-
+create database user_center;
 -- auto-generated definition
 create table user
 (
@@ -20,5 +19,9 @@ create table user
     userRole     int      default 0                 not null comment '用户角色( 0 - 默认用户 ， 1 - 管理员)'
 )
     comment '用户表';
+
+INSERT INTO `user` VALUES ('1', 'QiMU', 'qimu', 'https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/typora/logo.jpg', '0', 'ccb9d99c64e515ff8e62c8dbab9cb400', '17744608948', '2483482026@qq.com', '0', '2023-02-05 11:41:54', '2023-02-05 11:41:54', '0', '1');
+INSERT INTO `user` VALUES ('2', 'yanglele', 'yanglele1234', 'https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/typora/yk.png', '1', '89375dcf9e7cc02574ebfb2303fd6cfe', null, null, '0', '2023-02-05 17:35:02', '2023-02-05 17:35:02', '0', '1');
+
 
 

@@ -98,4 +98,13 @@ class UserServiceImplTest {
         // User b = userService.userLogin(userAccount, userPassword);
         // Assertions.assertTrue(b);
     }
+
+    @Test
+    void testP() {
+        String userAccount = "";
+        String pattern = "[0-9a-zA-Z]+";
+        if (!userAccount.matches(pattern)) {
+            System.out.println("包含");
+        }
+    }
 }

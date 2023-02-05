@@ -2,6 +2,8 @@ package com.qimu.usercenter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.qimu.usercenter.common.ErrorCode;
+import com.qimu.usercenter.exception.BusinessException;
 import com.qimu.usercenter.mapper.UserMapper;
 import com.qimu.usercenter.modle.domain.User;
 import com.qimu.usercenter.service.UserService;
@@ -42,24 +44,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public long userRegistration(String userAccount, String userPassword, String checkPassword) {
         // 1. 非空
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "输入参数不能为空 (>_<) !");
         }
         // 2. 账户长度不小于4位
         if (userAccount.length() < 4) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号过短,账号不能小于于4位 (>_<) !");
+        }
+        // 2. 账户长度不大于16位
+        if (userAccount.length() > 16) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号过长,账号不能大于16位 (>_<) !");
         }
         // 3. 密码就不小于8位吧
         if (userPassword.length() < 8 || checkPassword.length() < 8) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "密码过短,不能小于8位 (>_<) !");
         }
         //  5. 账户不包含特殊字符
+        // 匹配由数字、小写字母、大写字母组成的字符串,且字符串的长度至少为1个字符
         String pattern = "[0-9a-zA-Z]+";
         if (!userAccount.matches(pattern)) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号不能包含特殊字符 (>_<) !");
         }
         // 6. 密码和校验密码相同
         if (!userPassword.equals(checkPassword)) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "输入密码不一致,请重新输入 (>_<) !");
         }
 
         // 4. 账户不能重复
@@ -67,18 +74,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         queryWrapper.eq("userAccount", userAccount);
         long count = this.count(queryWrapper);
         if (count > 0) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号已存在,请重新输入 (>_<) !");
         }
 
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes(StandardCharsets.UTF_8));
         User user = new User();
         user.setUserAccount(userAccount);
         user.setUserPassword(encryptPassword);
-        boolean saveResult = this.save(user);
-        if (!saveResult) {
-            return -1;
-        }
+        user.setUsername("游客 (" + userAccount + ")");
         System.out.println(user.getId());
+        user.setAvatarUrl("https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/typora/yk.jpg");
+        boolean saveResult = this.save(user);
+        log.info("user=" + user);
+        if (!saveResult) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "注册失败,请重新输入 (>_<) !");
+        }
         return user.getId();
     }
 
@@ -86,20 +96,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public User userLogin(String userAccount, String userPassword, HttpServletRequest request) {
         // 1. 非空
         if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "输入参数不能为空 (>_<) !");
         }
         // 2. 账户长度不小于4位
         if (userAccount.length() < 4) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号过短,账号不能小于于4位 (>_<) !");
+        }
+        // 2. 账户长度不大于16位
+        if (userAccount.length() > 16) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号过长,账号不能大于16位 (>_<) !");
         }
         // 3. 密码就不小于8位吧
         if (userPassword.length() < 8) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "密码过短,不能小于8位 (>_<) !");
         }
         //  5. 账户不包含特殊字符
         String pattern = "[0-9a-zA-Z]+";
         if (!userAccount.matches(pattern)) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号不能包含特殊字符 (>_<) !");
         }
 
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes(StandardCharsets.UTF_8));
@@ -111,7 +125,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 用户不存在
         if (user == null) {
             log.info("user login failed,userAccount cannot match userPassword");
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户名或密码错误 (>_<) !");
         }
 
         // 用户脱敏
@@ -121,7 +135,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         request.getSession().setAttribute(LOGIN_USER_STATUS, safeUser);
         return safeUser;
     }
-
 
     /**
      * 用户脱敏

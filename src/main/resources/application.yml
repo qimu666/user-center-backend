@@ -1,16 +1,17 @@
 server:
-  port: 8090
+#  port: 8080
   servlet:
     context-path: /api
   reactive:
     session:
       timeout: 3600
+  address: 0.0.0.0
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/user_center
+    url: jdbc:mysql://101.43.61.87:3306/user_center
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: 1234
+    password: bf389934.@
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false
