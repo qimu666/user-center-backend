@@ -51,14 +51,15 @@ public class UserController {
         if (registerRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
+        String username = registerRequest.getUsername();
         String userAccount = registerRequest.getUserAccount();
         String userPassword = registerRequest.getUserPassword();
         String checkPassword = registerRequest.getCheckPassword();
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        long result = userService.userRegistration(userAccount, userPassword, checkPassword);
-        return ResultUtil.success(result,"注册成功");
+        long result = userService.userRegistration(username, userAccount, userPassword, checkPassword);
+        return ResultUtil.success(result, "注册成功");
     }
 
     @GetMapping("/current")

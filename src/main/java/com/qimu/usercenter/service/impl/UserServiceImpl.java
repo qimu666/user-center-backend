@@ -14,7 +14,6 @@ import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
 
 import static com.qimu.usercenter.contant.UserConstant.ADMIN_ROLE;
 import static com.qimu.usercenter.contant.UserConstant.LOGIN_USER_STATUS;
@@ -41,7 +40,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return 成功的条数
      */
     @Override
-    public long userRegistration(String userAccount, String userPassword, String checkPassword) {
+    public long userRegistration(String username, String userAccount, String userPassword, String checkPassword) {
         // 1. 非空
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "输入参数不能为空 (>_<) !");
@@ -81,9 +80,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User user = new User();
         user.setUserAccount(userAccount);
         user.setUserPassword(encryptPassword);
-        user.setUsername("游客 (" + userAccount + ")");
-        System.out.println(user.getId());
-        user.setAvatarUrl("https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/typora/yk.jpg");
+        if (StringUtils.isAnyBlank(username)) {
+            user.setUsername("游客 (" + userAccount + ")");
+        } else {
+            user.setUsername(username);
+        }
+        user.setAvatarUrl("https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/typora/yk.png");
         boolean saveResult = this.save(user);
         log.info("user=" + user);
         if (!saveResult) {
@@ -130,7 +132,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         // 用户脱敏
         User safeUser = getSateUser(user);
-
         // 记录用户的登录态
         request.getSession().setAttribute(LOGIN_USER_STATUS, safeUser);
         return safeUser;
@@ -157,7 +158,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         safeUser.setEmail(originUser.getEmail());
         safeUser.setUserRole(originUser.getUserRole());
         safeUser.setUserStatus(originUser.getUserStatus());
-        safeUser.setCreateTime(new Date());
+        safeUser.setCreateTime(originUser.getCreateTime());
         return safeUser;
     }
 

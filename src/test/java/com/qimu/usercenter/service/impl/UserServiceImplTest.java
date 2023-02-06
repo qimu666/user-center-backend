@@ -42,36 +42,37 @@ class UserServiceImplTest {
 
     @Test
     void userRegistration() {
+        String username = "";
         String userAccount = "";
         String userPassword = "123456";
         String checkPassword = "123456";
         // 1. 非空
-        long l = userService.userRegistration(userAccount, userPassword, checkPassword);
+        long l = userService.userRegistration(username,userAccount, userPassword, checkPassword);
         Assertions.assertEquals(l, -1);
         // 2. 账户长度不小于4位
         userAccount = "qm";
-        l = userService.userRegistration(userAccount, userPassword, checkPassword);
+        l = userService.userRegistration(username,userAccount, userPassword, checkPassword);
         Assertions.assertEquals(l, -1);
         // 3. 密码就不小于8位吧
         userPassword = "123456";
         checkPassword = "123456";
-        l = userService.userRegistration(userAccount, userPassword, checkPassword);
+        l = userService.userRegistration(username,userAccount, userPassword, checkPassword);
         Assertions.assertEquals(l, -1);
         // 5. 账户不包含特殊字符
         userAccount = "@##AA";
-        l = userService.userRegistration(userAccount, userPassword, checkPassword);
+        l = userService.userRegistration(username,userAccount, userPassword, checkPassword);
         Assertions.assertEquals(l, -1);
         // 6. 密码和校验密码相同
         userPassword = "12345678";
         checkPassword = "12345679";
-        l = userService.userRegistration(userAccount, userPassword, checkPassword);
+        l = userService.userRegistration(username,userAccount, userPassword, checkPassword);
         Assertions.assertEquals(l, -1);
         // 4. 账户不能重复
 
         userAccount = "qieruww";
         userPassword = "qwer1234";
         checkPassword = "qwer1234";
-        l = userService.userRegistration(userAccount, userPassword, checkPassword);
+        l = userService.userRegistration(username,userAccount, userPassword, checkPassword);
         Assertions.assertTrue(l > 0);
 
     }
