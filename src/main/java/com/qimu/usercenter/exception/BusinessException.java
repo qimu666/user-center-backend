@@ -3,12 +3,13 @@ package com.qimu.usercenter.exception;
 import com.qimu.usercenter.common.ErrorCode;
 
 /**
- * @author: QiMu
+ * @author: QiMu.
  * @Date: 2023年02月04日 21:14
  * @Version:1.0
  * @Description: 自定义异常类
  */
 public class BusinessException extends RuntimeException {
+    private static final long serialVersionUID = 5676980599897454498L;
     private final int code;
     private final String description;
 
